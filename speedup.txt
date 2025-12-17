@@ -1,0 +1,67 @@
+#include <Servo.h>
+Servo esc; // ESC vezerleshez
+int targetPWM = 1400; // Celteljesitmeny (1000 - 2000 us)
+int runTime = 30000; // Forgasi ido ms-ben
+int rampDelay = 50; // Gyorsitas/lassitas merteke
+int velNO = 1; // Hanyadik sebesseg
+
+void setup() {
+  // put your setup code here, to run once:
+  esc.attach(9); // ESC a D9 labon
+  Serial.begin(9600);
+  esc.writeMicroseconds(1000); // ESC inicializalasa a min jellel
+  Serial.println("ESC init: 1000 ms");
+  delay(3000);
+
+}
+
+void loop() {
+  Serial.println("Gyorsitas kezdosebessegre...");
+  // 1000 -> targetPWM
+  for (int pwm = 1000; pwm <= targetPWM; pwm += 5) {
+  esc.writeMicroseconds(pwm);
+  delay(rampDelay);
+  }
+  Serial.print("Sebesseg No. ");
+  Serial.print(velNO);
+  Serial.print(", stabil fordulatszam ");
+  Serial.print(targetPWM);
+  Serial.print("us jellel, ");
+  Serial.print(runTime / 500);
+  Serial.println(" masodpercig...");
+  delay(runTime);
+  delay(runTime);
+  velNO += 1;
+  }
+
+  while (targetPWM < 2000){
+  targetPWM += 50;
+  Serial.println("Lepteto gyorsitas indul...");
+  // Gyorsitas 1000 -> targetPWM
+  for (int pwm = (targetPWM-50); pwm <= targetPWM; pwm += 5) {
+  esc.writeMicroseconds(pwm);
+  delay(rampDelay);
+  }
+  Serial.print("Sebesseg No. ");
+  Serial.print(velNO);
+  Serial.print(", stabil fordulatszam ");
+  Serial.print(targetPWM);
+  Serial.print("us jellel, ");
+  Serial.print(runTime / 500);
+  Serial.println(" masodpercig...");
+  delay(runTime);
+  delay(runTime);
+  velNO += 1;
+  }
+  
+  Serial.println("Lassu leallitas indul...");
+  // Lassitas targetPWM -> 1000
+  for (int pwm = targetPWM; pwm >= 1000; pwm -= 5) {
+  esc.writeMicroseconds(pwm);
+  delay(rampDelay);
+  }
+  Serial.println("Motor teljesen leallt.");
+  esc.writeMicroseconds(1000); // Biztonsagos minimum
+  while (true); // Program vege, nem ismetlodik
+}
+
